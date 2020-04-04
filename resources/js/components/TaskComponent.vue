@@ -1,19 +1,34 @@
 <template>
     <div class="container">
-        <div class="row justify-content-center">
             <ul class="list-group">
-                <li class="list-group-item"><a href="">tache 1</a></li>
-                <li class="list-group-item"><a href="">tache 2</a></li>
-                <li class="list-group-item"><a href="">tache 3</a></li>
-                <li class="list-group-item"><a href="">tache 4</a></li>
-                <li class="list-group-item"><a href="">tache 5</a></li>
+                <li class="list-group-item" v-for="task in tasks.data" :key="task.id"><a href="">{{ task.name }}</a></li>
             </ul>
-        </div>
+            <pagination class="mt-5" :data="tasks" @pagination-change-page="getResults"></pagination>
     </div>
 </template>
 
 <script>
     export default {
+        data() {
+            return {
+                tasks: {}
+            }
+        },
+
+        created (){
+            axios.get('http://127.0.0.1:8000/tasksList')
+                .then(response => this.tasks = response.data)
+                .catch(error => console.log(error));
+        },
+        methods: {
+            // Our method to GET results from a Laravel endpoint
+            getResults(page = 1) {
+                axios.get('http://127.0.0.1:8000/tasksList?page=' + page)
+                    .then(response => {
+                        this.tasks = response.data;
+                    });
+            }
+        },
         mounted() {
             console.log('Component mounted.')
         }
